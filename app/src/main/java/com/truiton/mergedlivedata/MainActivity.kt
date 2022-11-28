@@ -2,10 +2,11 @@ package com.truiton.mergedlivedata
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
+import com.truiton.mergedlivedata.databinding.ActivityMainBinding
 
 class MainActivity : AppCompatActivity(), SearchFragment.OnSearchFragmentInteractionListener {
-
+    private lateinit var binding: ActivityMainBinding
 
     companion object {
         val TRIGGER_SERACH = 100
@@ -15,7 +16,8 @@ class MainActivity : AppCompatActivity(), SearchFragment.OnSearchFragmentInterac
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
         val fragment = supportFragmentManager.findFragmentByTag(SEARCH_TAG)
         if (fragment == null) {
             val ft = supportFragmentManager.beginTransaction()
@@ -24,7 +26,7 @@ class MainActivity : AppCompatActivity(), SearchFragment.OnSearchFragmentInterac
         }
 
         // For solving the empty room problem - so that we have some dat on screen initially to play with
-        val mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+        val mainActivityViewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
         mainActivityViewModel.getPlaces("coffee")
     }
 

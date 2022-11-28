@@ -26,7 +26,8 @@ class FourSquareRepo(private val favouriteDao: FavouriteDao) {
             mediatorLiveData.value = it
         }
 
-        roomLiveData = Transformations.switchMap(favouriteDao.getAllFavourites()) { favs -> getVenues(favs) }
+        roomLiveData =
+            Transformations.switchMap(favouriteDao.getAllFavourites()) { favs -> getVenues(favs) }
         mediatorLiveData.addSource(roomLiveData) {
             mediatorLiveData.value = it
         }
