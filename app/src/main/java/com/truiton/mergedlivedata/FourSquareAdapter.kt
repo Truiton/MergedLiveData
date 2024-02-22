@@ -10,8 +10,8 @@ import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import com.truiton.mergedlivedata.databinding.FourSqRecyclerviewItemBinding
 import com.truiton.mergedlivedata.model.Venues
-import kotlinx.android.synthetic.main.recyclerview_item.view.*
 
 
 class FourSquareAdapter internal constructor(
@@ -22,33 +22,35 @@ class FourSquareAdapter internal constructor(
     private var foursquareItems = emptyList<Venues>() // Cached copy of foursquareItems
     lateinit var mClickListener: ClickListener
 
-    inner class PlaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class PlaceViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView),
+        View.OnClickListener {
         init {
             itemView.setOnClickListener(this)
         }
-
-        val placeName: TextView = itemView.place_name
-        val placeCategory: TextView = itemView.place_category
-        val placeDistance: TextView = itemView.place_distance
-        val placeIcon: ImageView = itemView.place_icon
-        val favouriteIcon: ToggleButton = itemView.button_favorite
+        val binding = FourSqRecyclerviewItemBinding.bind(itemView)
+        val placeName: TextView = binding.placeName
+        val placeCategory: TextView = binding.placeCategory
+        val placeDistance: TextView = binding.placeDistance
+        val placeIcon: ImageView = binding.placeIcon
+        val favouriteIcon: ToggleButton = binding.buttonFavorite
 
         override fun onClick(v: View) {
-            mClickListener.onClick(adapterPosition, v)
+            mClickListener.onClick(absoluteAdapterPosition, v)
         }
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): PlaceViewHolder {
-        val itemView = inflater.inflate(R.layout.recyclerview_item, parent, false)
+        val itemView = inflater.inflate(R.layout.four_sq_recyclerview_item, parent, false)
         return PlaceViewHolder(itemView)
     }
 
     override fun onBindViewHolder(holder: PlaceViewHolder, position: Int) {
         val current = foursquareItems[position]
         holder.placeName.text = current.name
-        if (current.categories.isNotEmpty()){
+        if (current.categories.isNotEmpty()) {
             holder.placeCategory.text = current.categories[0].name
-            Glide.with(ctx).load(current.categories[0].icon.prefix + "bg_64" + current.categories[0].icon.suffix)
+            Glide.with(ctx)
+                .load(current.categories[0].icon.prefix + "bg_64" + current.categories[0].icon.suffix)
                 .into(holder.placeIcon)
         } else {
             holder.placeCategory.text = "N/A"

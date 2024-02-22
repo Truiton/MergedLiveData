@@ -2,7 +2,7 @@ package com.truiton.mergedlivedata
 
 import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 
 class MainActivity : AppCompatActivity(), SearchFragment.OnSearchFragmentInteractionListener {
 
@@ -24,7 +24,7 @@ class MainActivity : AppCompatActivity(), SearchFragment.OnSearchFragmentInterac
         }
 
         // For solving the empty room problem - so that we have some dat on screen initially to play with
-        val mainActivityViewModel = ViewModelProviders.of(this).get(MainActivityViewModel::class.java)
+        val mainActivityViewModel = ViewModelProvider(this)[MainActivityViewModel::class.java]
         mainActivityViewModel.getPlaces("coffee")
     }
 

@@ -4,7 +4,7 @@ import androidx.annotation.WorkerThread
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MediatorLiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.Transformations
+import androidx.lifecycle.switchMap
 import com.truiton.mergedlivedata.dao.FavouriteDao
 import com.truiton.mergedlivedata.entity.Favourite
 import com.truiton.mergedlivedata.model.Venues
@@ -26,7 +26,7 @@ class FourSquareRepo(private val favouriteDao: FavouriteDao) {
             mediatorLiveData.value = it
         }
 
-        roomLiveData = Transformations.switchMap(favouriteDao.getAllFavourites()) { favs -> getVenues(favs) }
+        roomLiveData = favouriteDao.getAllFavourites().switchMap { favs -> getVenues(favs) }
         mediatorLiveData.addSource(roomLiveData) {
             mediatorLiveData.value = it
         }

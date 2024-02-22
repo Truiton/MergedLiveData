@@ -24,7 +24,7 @@
             android:id="@+id/items"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            tools:listitem="@layout/recyclerview_item"
+            tools:listitem="@layout/four_sq_recyclerview_item"
             app:layout_constraintTop_toBottomOf="@+id/search_box"/>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

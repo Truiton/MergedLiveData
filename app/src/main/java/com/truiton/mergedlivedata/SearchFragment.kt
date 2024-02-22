@@ -14,13 +14,18 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.Observer
-import androidx.lifecycle.ViewModelProviders
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_search.*
+import com.truiton.mergedlivedata.databinding.FragmentSearchBinding
 
 
 class SearchFragment : Fragment() {
+    private var _binding: FragmentSearchBinding? = null
+
+    // This property is only valid between onCreateView and
+// onDestroyView.
+    private val binding get() = _binding!!
     private var listenerSearch: OnSearchFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,7 +37,9 @@ class SearchFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View? {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_search, container, false)
+        _binding = FragmentSearchBinding.inflate(inflater, container, false)
+        val view = binding.root
+        return view
     }
 
     override fun onAttach(context: Context) {
@@ -47,12 +54,12 @@ class SearchFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val adapter = activity?.let { FourSquareAdapter(it) }
-        items.adapter = adapter
-        items.layoutManager = LinearLayoutManager(activity) as RecyclerView.LayoutManager?
+        binding.items.adapter = adapter
+        binding.items.layoutManager = LinearLayoutManager(activity) as RecyclerView.LayoutManager?
 
         var mainActivityViewModel: MainActivityViewModel =
-            ViewModelProviders.of(activity!!).get(MainActivityViewModel::class.java)
-        mainActivityViewModel.allFavourites.observe(this, Observer { words ->
+            ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
+        mainActivityViewModel.allFavourites.observe(viewLifecycleOwner, Observer { words ->
             words?.let { adapter?.setWords(it) }
         })
 
@@ -67,16 +74,16 @@ class SearchFragment : Fragment() {
 
         val handler: Handler = @SuppressLint("HandlerLeak")
         object : Handler() {
-            override fun handleMessage(msg: Message?) {
-                if (msg!!.what == MainActivity.TRIGGER_SERACH) {
-                    if (!TextUtils.isEmpty(search_box?.text)) {
-                        mainActivityViewModel.getPlaces(search_box.text.toString())
+            override fun handleMessage(msg: Message) {
+                if (msg.what == MainActivity.TRIGGER_SERACH) {
+                    if (!TextUtils.isEmpty(binding.searchBox?.text)) {
+                        mainActivityViewModel.getPlaces(binding.searchBox.text.toString())
                     }
                 }
             }
         }
 
-        search_box.addTextChangedListener(object : TextWatcher {
+        binding.searchBox.addTextChangedListener(object : TextWatcher {
             override fun afterTextChanged(p0: Editable?) {
             }
 
@@ -85,7 +92,10 @@ class SearchFragment : Fragment() {
 
             override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
                 handler.removeMessages(MainActivity.TRIGGER_SERACH)
-                handler.sendEmptyMessageDelayed(MainActivity.TRIGGER_SERACH, MainActivity.SEARCH_TRIGGER_DELAY_IN_MS)
+                handler.sendEmptyMessageDelayed(
+                    MainActivity.TRIGGER_SERACH,
+                    MainActivity.SEARCH_TRIGGER_DELAY_IN_MS
+                )
             }
         })
 
@@ -94,6 +104,11 @@ class SearchFragment : Fragment() {
     override fun onDetach() {
         super.onDetach()
         listenerSearch = null
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     interface OnSearchFragmentInteractionListener {
