@@ -4,6 +4,7 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.os.Bundle
 import android.os.Handler
+import android.os.Looper
 import android.os.Message
 import android.text.Editable
 import android.text.TextUtils
@@ -35,11 +36,10 @@ class SearchFragment : Fragment() {
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         // Inflate the layout for this fragment
-        _binding = FragmentSearchBinding.inflate(inflater, container, false)
-        val view = binding.root
-        return view
+        _binding = FragmentSearchBinding.inflate(layoutInflater, container, false)
+        return binding.root
     }
 
     override fun onAttach(context: Context) {
@@ -57,8 +57,7 @@ class SearchFragment : Fragment() {
         binding.items.adapter = adapter
         binding.items.layoutManager = LinearLayoutManager(activity) as RecyclerView.LayoutManager?
 
-        var mainActivityViewModel: MainActivityViewModel =
-            ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
+        var mainActivityViewModel: MainActivityViewModel = ViewModelProvider(requireActivity())[MainActivityViewModel::class.java]
         mainActivityViewModel.allFavourites.observe(viewLifecycleOwner, Observer { words ->
             words?.let { adapter?.setWords(it) }
         })
@@ -73,7 +72,7 @@ class SearchFragment : Fragment() {
         })
 
         val handler: Handler = @SuppressLint("HandlerLeak")
-        object : Handler() {
+        object : Handler(Looper.myLooper()!!) {
             override fun handleMessage(msg: Message) {
                 if (msg.what == MainActivity.TRIGGER_SERACH) {
                     if (!TextUtils.isEmpty(binding.searchBox?.text)) {
